@@ -1,5 +1,5 @@
 ---
-name: Build simple
+name: Build
 
 on:
   push:
