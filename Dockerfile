@@ -1,4 +1,6 @@
-FROM node:20-alpine3.18
+ARG BASE_TAG
+
+FROM node:${BASE_TAG}
 
 WORKDIR /root
 

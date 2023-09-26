@@ -33,14 +33,15 @@ jobs:
     strategy:
       matrix:
         platform:
-          [
-            linux/amd64,
-            linux/arm/v6,
-            linux/arm/v7,
-            linux/arm64,
-            linux/ppc64le,
-            linux/s390x,
-          ]
+          - linux/amd64
+          - linux/arm/v6
+          - linux/arm/v7
+          - linux/arm64
+          - linux/ppc64le
+          - linux/s390x
+        base_tag:
+          - 18-alpine3.18
+          - 20-alpine3.18
     steps:
       - name: Checkout
         uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # tag=v4.1.0
@@ -54,6 +55,7 @@ jobs:
       - name: Build image for archive
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # tag=v5.0.0
         with:
+          build-args: BASE_TAG=${{ matrix.base_tag }}
           context: .
           file: ./Dockerfile
           outputs: type=docker,dest=/tmp/image.tar
