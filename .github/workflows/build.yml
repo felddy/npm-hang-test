@@ -38,7 +38,7 @@ jobs:
     timeout-minutes: 3
     strategy:
       matrix:
-        platform: ${{ fromJson(needs.config.outputs.platforms) }}
+        platform: ${{ fromJson(needs.config.outputs.platforms_json) }}
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@8ca2b8b2ece13480cda6dacd3511b49857a23c09 # tag=v2.5.1
