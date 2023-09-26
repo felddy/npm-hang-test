@@ -2,10 +2,10 @@
 name: Build with reusable workflows
 
 on:
-  push:
-    branches:
-      - "**"
-  pull_request:
+  # push:
+  #   branches:
+  #     - "**"
+  # pull_request:
   workflow_dispatch:
     inputs:
       dispatch-tag:
