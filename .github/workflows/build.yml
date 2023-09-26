@@ -1,5 +1,5 @@
 ---
-name: Build
+name: Build simple
 
 on:
   push:
@@ -17,6 +17,9 @@ permissions:
   actions: read
   contents: read
 
+env:
+  OUTPUT_ARTIFACT_WORK_DIR: /tmp/output-artifact-work
+
 jobs:
   config:
     name: "Config"
@@ -29,22 +32,45 @@ jobs:
     with:
       image_name: ${{ needs.config.outputs.image_name }}
 
-  build-each-platform:
-    name: "Build platform"
-    needs:
-      - config
-      - metadata
-    if: github.event_name != 'pull_request'
+  build-image:
+    name: "Build image"
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
     strategy:
       matrix:
-        platform: ${{ fromJson(needs.config.outputs.platforms_json) }}
-        exclude:
-          - platform: ${{ needs.config.outputs.test_platform }}
-    uses: felddy/reusable-workflows/.github/workflows/docker-build-image.yml@develop
-    with:
-      artifact_name: ${{ needs.config.outputs.image_archive_artifact_name }}
-      cache_from_scopes: ${{ matrix.platform }}
-      cache_to_scope: ${{ matrix.platform }}
-      image_labels: ${{ needs.metadata.outputs.image_labels }}
-      image_archive_name_stem: ${{ matrix.platform }}
-      platforms: ${{ matrix.platform }}
+        platform: ${{ fromJson(needs.config.outputs.platforms) }}
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@8ca2b8b2ece13480cda6dacd3511b49857a23c09 # tag=v2.5.1
+        with:
+          disable-sudo: true
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # tag=v4.1.0
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@68827325e0b33c7199eb31dd4e31fbe9023e06e3 # tag=v3.0.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f95db51fddba0c2d1ec667646a06c2ce06100226 # tag=v3.0.0
+
+      - name: Create directories for artifact work
+        run: |
+          mkdir -p ${{ env.OUTPUT_ARTIFACT_WORK_DIR }}
+
+      - name: Clean variables
+        id: clean
+        run: |
+          echo image_archive_name_stem=$(echo "${{ matrix.platform }}" | sed -e 's/[^a-zA-Z0-9._-]/_/g') >> $GITHUB_OUTPUT
+
+      - name: Build image for archive
+        uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # tag=v5.0.0
+        with:
+          context: .
+          file: ./Dockerfile
+          labels: ${{ needs.metadata.outputs.image_labels }}
+          outputs: type=docker,dest=${{ env.OUTPUT_ARTIFACT_WORK_DIR }}/${{ steps.clean.outputs.image_archive_name_stem }}.tar
+          platforms: ${{ matrix.platform }}
+          push: false
+          tags: test
