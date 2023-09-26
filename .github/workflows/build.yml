@@ -7,46 +7,41 @@ on:
       - "**"
   pull_request:
   workflow_dispatch:
-    inputs:
-      dispatch-tag:
-        description: "Tag to apply to pushed images"
-        required: true
-        default: "dispatch"
 
 permissions:
   actions: read
   contents: read
 
-env:
-  OUTPUT_ARTIFACT_WORK_DIR: /tmp/output-artifact-work
-
 jobs:
-  config:
-    name: "Config"
-    uses: ./.github/workflows/_config.yml
+  diagnostics:
+    name: "Diagnostics"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check GitHub Status
+        uses: crazy-max/ghaction-github-status@df4d23a4977438215339cf0fafceda8d9af8a0e5 # tag=v4.0.0
+        with:
+          overall_threshold: major
+          packages_threshold: major_outage
 
-  metadata:
-    name: "Metadata"
-    needs: [config]
-    uses: felddy/reusable-workflows/.github/workflows/docker-metadata.yml@develop
-    with:
-      image_name: ${{ needs.config.outputs.image_name }}
+      - name: Dump context
+        uses: crazy-max/ghaction-dump-context@8b55fa205ab4530d36f787a4de1009afaaa7f3b4 # tag=v2.1.0
 
   build-image:
     name: "Build image"
-    needs: [config, metadata]
     runs-on: ubuntu-latest
     timeout-minutes: 3
     strategy:
       matrix:
-        platform: ${{ fromJson(needs.config.outputs.platforms_json) }}
+        platform:
+          [
+            linux/amd64,
+            linux/arm/v6,
+            linux/arm/v7,
+            linux/arm64,
+            linux/ppc64le,
+            linux/s390x,
+          ]
     steps:
-      # - name: Harden Runner
-      #   uses: step-security/harden-runner@8ca2b8b2ece13480cda6dacd3511b49857a23c09 # tag=v2.5.1
-      #   with:
-      #     disable-sudo: true
-      #     egress-policy: audit
-
       - name: Checkout
         uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # tag=v4.1.0
 
@@ -55,10 +50,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f95db51fddba0c2d1ec667646a06c2ce06100226 # tag=v3.0.0
-
-      - name: Create directories for artifact work
-        run: |
-          mkdir -p ${{ env.OUTPUT_ARTIFACT_WORK_DIR }}
 
       - name: Clean variables
         id: clean
@@ -70,7 +61,6 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          labels: ${{ needs.metadata.outputs.image_labels }}
-          outputs: type=docker,dest=${{ env.OUTPUT_ARTIFACT_WORK_DIR }}/${{ steps.clean.outputs.image_archive_name_stem }}.tar
+          outputs: type=docker,dest=/tmp/${{ steps.clean.outputs.image_archive_name_stem }}.tar
           platforms: ${{ matrix.platform }}
           push: false
