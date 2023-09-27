@@ -16,7 +16,10 @@ RUN which node
 RUN file $(which node)
 
 # Use ldd to inspect the node binary
-RUN ldd $(which node)
+# 139 errors: 
+# https://github.com/multiarch/qemu-user-static/issues/172
+# https://gitlab.com/qemu-project/qemu/-/issues/1763
+RUN ldd $(which node) || echo $?
 
 # Print the version of node
 RUN node -v
