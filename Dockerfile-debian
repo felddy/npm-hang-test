@@ -5,7 +5,9 @@ FROM node:${BASE_TAG}
 WORKDIR /root
 
 # Install the file command
-# RUN apk add --no-cache file
+RUN apt-get update && \
+    apt-get install -y file && \
+    rm -rf /var/lib/apt/lists/*
 
 # Check the path to the node executable
 RUN which node
