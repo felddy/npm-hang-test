@@ -6,6 +6,8 @@ on:
     branches:
       - "**"
   pull_request:
+  schedule:
+    - cron: "20 10 * * *" # everyday at 10:20 UTC
   workflow_dispatch:
 
 permissions:
