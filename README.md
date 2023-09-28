@@ -1,6 +1,6 @@
 # npm-hang-test 😩 #
 
-[![Build](https://github.com/felddy/npm-hang-test/actions/workflows/build.yml/badge.svg)](https://github.com/felddy/npm-hang-test/actions/workflows/build.yml)
+[<img src="https://github.com/felddy/npm-hang-test/actions/workflows/build.yml/badge.svg" width="512">](https://github.com/felddy/npm-hang-test/actions/workflows/build.yml)
 
 Investigating why the command `npm` hangs in the [offical NodeJS images](https://hub.docker.com/_/node) when run in GitHub Actions.
 
