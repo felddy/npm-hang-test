@@ -1,0 +1,33 @@
+---
+name: sync-labels
+
+on:
+  push:
+    paths:
+      - '.github/labels.yml'
+      - '.github/workflows/sync-labels.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  labeler:
+    permissions:
+      # actions/checkout needs this to fetch code
+      contents: read
+      # crazy-max/ghaction-github-labeler needs this to manage repository labels
+      issues: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@8ca2b8b2ece13480cda6dacd3511b49857a23c09  # tag=v2.5.1
+        with:
+          egress-policy: audit  # TODO: change to 'egress-policy: block' after couple of runs
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac  # tag=v4.0.0
+      - name: Sync repository labels
+        if: success()
+        uses: crazy-max/ghaction-github-labeler@de749cf181958193cb7debf1a9c5bb28922f3e1b  # tag=v5.0.0
+        with:
+          # This is a hideous ternary equivalent so we only do a dry run unless
+          # this workflow is triggered by the develop branch.
+          dry-run: ${{ github.ref_name == 'develop' && 'false' || 'true' }}
