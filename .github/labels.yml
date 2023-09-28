@@ -78,3 +78,6 @@
 - name: "wontfix :coffin:"
   color: "ffffff"
   description: ""
+- name: "ship it :shipit:"
+  color: "914165"
+  description: ""
