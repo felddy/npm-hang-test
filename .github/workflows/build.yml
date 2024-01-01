@@ -43,8 +43,8 @@ jobs:
           - linux/ppc64le
           - linux/s390x
         base_tag:
-          - 18-alpine3.18
-          - 20-alpine3.18
+          - 18-alpine3.19
+          - 20-alpine3.19
     steps:
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # tag=v4.1.1
