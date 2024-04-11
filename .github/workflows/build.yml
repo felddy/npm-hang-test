@@ -29,7 +29,7 @@ jobs:
           packages_threshold: major_outage
 
       - name: Dump context
-        uses: crazy-max/ghaction-dump-context@fc6f6179f2c41d2ea976b81b79a947393c3a02d9 # tag=v2.2.0
+        uses: crazy-max/ghaction-dump-context@5355a8e5e6ac5a302e746a1c4b7747a0393863c8 # tag=v2.3.0
 
   build-image-alpine:
     name: "Alpine"
