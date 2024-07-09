@@ -48,6 +48,7 @@ jobs:
         base_tag:
           - 18-alpine3.20
           - 20-alpine3.20
+          - 22-alpine3.20
     steps:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # tag=v4.1.7
@@ -87,6 +88,7 @@ jobs:
         base_tag:
           - 18-bookworm-slim
           - 20-bookworm-slim
+          - 22-bookworm-slim
     steps:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # tag=v4.1.7
